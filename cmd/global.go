@@ -36,7 +36,9 @@ Once you set your global .driveignore you can delete the file you pointed to.`,
 		cwd, _ := os.Getwd()
 		absPath := filepath.Join(cwd, args[0])
 		content, _ := ioutil.ReadFile(absPath)
+		vPrint("loaded file contents")
 		ioutil.WriteFile(filepath.Join(currFile, "../../.global_driveignore"), content, os.ModePerm)
+		vPrint("saved the contents to a .global_driveignore")
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {

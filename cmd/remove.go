@@ -30,6 +30,7 @@ var removeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_, currFile, _, _ := runtime.Caller(0)
 		os.Remove(filepath.Join(currFile, "../../.global_driveignore"))
+		vPrint(".global_driveignore has been deleted")
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 0 {

@@ -50,8 +50,10 @@ current folder > global config
 			return errors.New("No local nor global .driveignores found")
 		} else if (!os.IsNotExist(err1) && !mergeIgnores) || (os.IsNotExist(err2) && mergeIgnores) {
 			driveignore, _ = gitignore.NewGitIgnore(localDI)
+			vPrint("loaded local .driveignore")
 		} else if (!os.IsNotExist(err2) && !mergeIgnores) || (os.IsNotExist(err1) && mergeIgnores) {
 			driveignore, _ = gitignore.NewGitIgnore(globalDI)
+			vPrint("loaded global .driveignore")
 		} else if !os.IsNotExist(err1) && !os.IsNotExist(err2) && mergeIgnores {
 			globalContent, _ := ioutil.ReadFile(globalDI)
 			localContent, _ := ioutil.ReadFile(localDI)
@@ -66,6 +68,7 @@ current folder > global config
 
 			driveignore, _ = gitignore.NewGitIgnore(file.Name())
 			file.Close()
+			vPrint("loaded merged global and local .driveignore")
 		}
 		err := filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
 			goalPath, _ := filepath.Rel(input, path)
@@ -80,8 +83,10 @@ current folder > global config
 
 			// ignore .driveignore files/dirs
 			if info.IsDir() && driveignore.Match(path, true) {
+				vPrint("skipped directory:", path)
 				return filepath.SkipDir
 			} else if !info.IsDir() && driveignore.Match(path, false) {
+				vPrint("skipped file:", path)
 				return nil
 			}
 
@@ -95,6 +100,7 @@ current folder > global config
 			if !info.IsDir() && !os.IsNotExist(err) && !os.SameFile(pathStat, goalStat) {
 				os.Remove(goal)
 				sameNameDiffFile = true
+				vPrint("overwritting a file with same name")
 			}
 			if os.IsNotExist(err) || sameNameDiffFile {
 				if info.IsDir() {
@@ -104,6 +110,7 @@ current folder > global config
 					}
 				} else {
 					err = os.Link(path, goal)
+					vPrint("created hard link:", path)
 					if err != nil {
 						panic(err)
 					}
