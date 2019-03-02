@@ -56,9 +56,7 @@ current folder > global config
 		}
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
-			return errors.New("requires only one argument")
-		}
+		cobra.ExactArgs(1)
 		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
 			return errors.New("passed path is invalid")
 		}
