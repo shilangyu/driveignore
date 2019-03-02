@@ -53,10 +53,20 @@ current folder > global config
 				return nil
 			}
 
-			// create a hard link to the given path
-			err = os.Link(path, filepath.Join(args[0], path))
-			if err != nil {
-				panic(err)
+			// link it doesnt yet exist
+			goal := filepath.Join(args[0], path)
+			if _, err := os.Stat(goal); os.IsNotExist(err) {
+				if info.IsDir() {
+					err = os.Mkdir(goal, os.ModePerm)
+					if err != nil {
+						panic(err)
+					}
+				} else {
+					err = os.Link(path, goal)
+					if err != nil {
+						panic(err)
+					}
+				}
 			}
 			return nil
 		})
