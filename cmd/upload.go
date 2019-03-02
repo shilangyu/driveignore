@@ -29,7 +29,7 @@ import (
 // uploadCmd represents the upload command
 var uploadCmd = &cobra.Command{
 	Use:   "upload [output path]",
-	Short: "Upload files to your drive folder",
+	Short: "Upload a directory to your drive folder",
 	Long: `Uploads files from the current directory (can be overwritten with --input flag) to a drive folder
 It will ignore files that satisfy the .driveignore
 The order of importance of a .driveignore file:
