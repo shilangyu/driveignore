@@ -37,8 +37,14 @@ Once you set your global .driveignore you can delete the file you pointed to.`,
 		absPath := filepath.Join(cwd, args[0])
 		content, _ := ioutil.ReadFile(absPath)
 		vPrint("loaded file contents")
-		ioutil.WriteFile(filepath.Join(currFile, "../../.global_driveignore"), content, os.ModePerm)
-		vPrint("saved the contents to a .global_driveignore")
+		if shouldAppend {
+			currContent, _ := ioutil.ReadFile(filepath.Join(currFile, "../../.global_driveignore"))
+			ioutil.WriteFile(filepath.Join(currFile, "../../.global_driveignore"), []byte(string(content)+"\n"+string(currContent)), os.ModePerm)
+			vPrint("appended the contents to the .global_driveignore")
+		} else {
+			ioutil.WriteFile(filepath.Join(currFile, "../../.global_driveignore"), content, os.ModePerm)
+			vPrint("saved the contents to the .global_driveignore")
+		}
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
@@ -55,6 +61,10 @@ Once you set your global .driveignore you can delete the file you pointed to.`,
 	},
 }
 
+var shouldAppend bool
+
 func init() {
 	rootCmd.AddCommand(globalCmd)
+
+	globalCmd.Flags().BoolVarP(&shouldAppend, "append", "a", false, "appends file contents to existing .global_driveignore")
 }
