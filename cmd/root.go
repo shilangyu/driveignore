@@ -27,7 +27,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "driveignore",
 	Short: ".driveignore over your Drive Backup and Sync",
-	Long: `This one-command cli allows you to have .driveignore(s)
+	Long: `This simple cli allows you to have .driveignore(s)
 It will look for a .driveignore, ignore the specified files
 and make a hard link of your files to your drivesync folder
 meaning no files duplicates, and no repetitive cli calls.`,
