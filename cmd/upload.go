@@ -16,8 +16,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -40,15 +38,26 @@ current folder > global config
 		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 			path, _ = filepath.Rel(root, path)
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
-			if info.IsDir() && driveignore.Match(path, true) {
-				return filepath.SkipDir
-			}
-			if driveignore.Match(path, false) {
+
+			// skip the folder itself
+			if path == "." {
 				return nil
 			}
-			fmt.Println(path)
+
+			// ignore .driveignore files/dirs
+			if info.IsDir() && driveignore.Match(path, true) {
+				return filepath.SkipDir
+			} else if !info.IsDir() && driveignore.Match(path, false) {
+				return nil
+			}
+
+			// create a hard link to the given path
+			err = os.Link(path, filepath.Join(args[0], path))
+			if err != nil {
+				panic(err)
+			}
 			return nil
 		})
 		if err != nil {
