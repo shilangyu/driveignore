@@ -21,8 +21,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "driveignore",
@@ -42,5 +40,4 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.driveignore.yaml)")
 }
