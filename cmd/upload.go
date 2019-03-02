@@ -16,8 +16,11 @@ package cmd
 
 import (
 	"errors"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	gitignore "github.com/monochromegane/go-gitignore"
 	"github.com/spf13/cobra"
@@ -32,16 +35,46 @@ It will ignore files that satisfy the .driveignore
 The order of importance of a .driveignore file:
 current folder > global config 
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-		driveignore, _ := gitignore.NewGitIgnore(filepath.Join(input, ".driveignore"))
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// decide on .driveignore
+		var driveignore gitignore.IgnoreMatcher
+		var tempFileName string
+
+		localDI := filepath.Join(input, ".driveignore")
+		_, currFile, _, _ := runtime.Caller(0)
+		globalDI := filepath.Join(currFile, "../../.global_driveignore")
+
+		_, err1 := os.Stat(localDI)
+		_, err2 := os.Stat(globalDI)
+		if os.IsNotExist(err1) && os.IsNotExist(err2) {
+			return errors.New("No local nor global .driveignores found")
+		} else if (!os.IsNotExist(err1) && !mergeIgnores) || (os.IsNotExist(err2) && mergeIgnores) {
+			driveignore, _ = gitignore.NewGitIgnore(localDI)
+		} else if (!os.IsNotExist(err2) && !mergeIgnores) || (os.IsNotExist(err1) && mergeIgnores) {
+			driveignore, _ = gitignore.NewGitIgnore(globalDI)
+		} else if !os.IsNotExist(err1) && !os.IsNotExist(err2) && mergeIgnores {
+			globalContent, _ := ioutil.ReadFile(globalDI)
+			localContent, _ := ioutil.ReadFile(localDI)
+
+			file, err := ioutil.TempFile("./", "tmp.*.temp")
+			if err != nil {
+				log.Fatal(err)
+			}
+			tempFileName = file.Name()
+			defer os.Remove(file.Name())
+			file.Write([]byte(string(globalContent) + "\n" + string(localContent)))
+
+			driveignore, _ = gitignore.NewGitIgnore(file.Name())
+			file.Close()
+		}
 		err := filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
 			goalPath, _ := filepath.Rel(input, path)
 			if err != nil {
 				panic(err)
 			}
 
-			// skip the folder itself
-			if path == "." {
+			// skip the folder itself and temp merge file
+			if path == "." || path == tempFileName {
 				return nil
 			}
 
@@ -81,6 +114,7 @@ current folder > global config
 		if err != nil {
 			panic(err)
 		}
+		return nil
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
