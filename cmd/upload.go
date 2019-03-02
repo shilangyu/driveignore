@@ -53,9 +53,18 @@ current folder > global config
 				return nil
 			}
 
-			// link it doesnt yet exist
+			// if same name file already exists, check if its the same hardlink, then ignore
+			// else if not, create hardlink
+			// if its a directory, create one if doesnt yet exist
 			goal := filepath.Join(args[0], path)
-			if _, err := os.Stat(goal); os.IsNotExist(err) {
+			goalStat, err := os.Stat(goal)
+			pathStat, _ := os.Stat(path)
+			sameNameDiffFile := false
+			if !info.IsDir() && !os.IsNotExist(err) && !os.SameFile(pathStat, goalStat) {
+				os.Remove(goal)
+				sameNameDiffFile = true
+			}
+			if os.IsNotExist(err) || sameNameDiffFile {
 				if info.IsDir() {
 					err = os.Mkdir(goal, os.ModePerm)
 					if err != nil {
