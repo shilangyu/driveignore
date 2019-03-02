@@ -31,6 +31,8 @@ and make a hard link of your files to your drivesync folder
 meaning no files duplicates, and no repetitive cli calls.`,
 }
 
+var verbose bool
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
@@ -40,4 +42,5 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Prints out whats happening")
 }
