@@ -86,8 +86,12 @@ current folder > global config
 		if len(args) != 1 {
 			return errors.New("There should only be one argument")
 		}
-		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
-			return errors.New("Passed path is invalid")
+		fstat, err := os.Stat(args[0])
+		if os.IsNotExist(err) {
+			return errors.New("Passed path doesnt exist")
+		}
+		if !fstat.IsDir() {
+			return errors.New("Passed path isnt a directory")
 		}
 		return nil
 	},
