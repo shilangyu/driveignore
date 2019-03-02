@@ -33,10 +33,9 @@ The order of importance of a .driveignore file:
 current folder > global config 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		root, _ := os.Getwd()
-		driveignore, _ := gitignore.NewGitIgnore("./.driveignore")
-		err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-			path, _ = filepath.Rel(root, path)
+		driveignore, _ := gitignore.NewGitIgnore(filepath.Join(input, ".driveignore"))
+		err := filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
+			goalPath, _ := filepath.Rel(input, path)
 			if err != nil {
 				panic(err)
 			}
@@ -56,7 +55,7 @@ current folder > global config
 			// if same name file already exists, check if its the same hardlink, then ignore
 			// else if not, create hardlink
 			// if its a directory, create one if doesnt yet exist
-			goal := filepath.Join(args[0], path)
+			goal := filepath.Join(args[0], goalPath)
 			goalStat, err := os.Stat(goal)
 			pathStat, _ := os.Stat(path)
 			sameNameDiffFile := false
