@@ -49,10 +49,10 @@ current folder > global config
 		if os.IsNotExist(err1) && os.IsNotExist(err2) {
 			return errors.New("No local nor global .driveignores found")
 		} else if (!os.IsNotExist(err1) && !mergeIgnores) || (os.IsNotExist(err2) && mergeIgnores) {
-			driveignore, _ = gitignore.NewGitIgnore(localDI)
+			driveignore, _ = gitignore.NewGitIgnore(localDI, "./")
 			vPrint("loaded local .driveignore")
 		} else if (!os.IsNotExist(err2) && !mergeIgnores) || (os.IsNotExist(err1) && mergeIgnores) {
-			driveignore, _ = gitignore.NewGitIgnore(globalDI)
+			driveignore, _ = gitignore.NewGitIgnore(globalDI, "./")
 			vPrint("loaded global .driveignore")
 		} else if !os.IsNotExist(err1) && !os.IsNotExist(err2) && mergeIgnores {
 			globalContent, _ := ioutil.ReadFile(globalDI)
@@ -66,7 +66,7 @@ current folder > global config
 			defer os.Remove(file.Name())
 			file.Write([]byte(string(globalContent) + "\n" + string(localContent)))
 
-			driveignore, _ = gitignore.NewGitIgnore(file.Name())
+			driveignore, _ = gitignore.NewGitIgnore(file.Name(), "./")
 			file.Close()
 			vPrint("loaded merged global and local .driveignore")
 		}
