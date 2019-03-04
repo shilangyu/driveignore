@@ -66,7 +66,7 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 
 			// adding slash to directories for print clarity
 			if temp, _ := os.Stat(currPath); temp.IsDir() {
-				relativePath += "/"
+				relativePath += "\\"
 			}
 
 			// ignore .driveignore files/dirs

@@ -56,7 +56,7 @@ current folder > global config
 
 			// adding slash to directories for print clarity
 			if temp, _ := os.Stat(currPath); temp.IsDir() {
-				relativePath += "/"
+				relativePath += "\\"
 			}
 
 			// skip the folder itself
