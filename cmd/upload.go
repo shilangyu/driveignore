@@ -48,48 +48,48 @@ current folder > global config
 			return errors.New("No local nor global .driveignores found")
 		}
 
-		err := filepath.Walk(uploadInput, func(path string, info os.FileInfo, err error) error {
-			goalPath, _ := filepath.Rel(uploadInput, path)
+		err := filepath.Walk(uploadInput, func(currPath string, info os.FileInfo, err error) error {
+			relativePath, _ := filepath.Rel(uploadInput, currPath)
 			if err != nil {
 				panic(err)
 			}
 
 			// skip the folder itself
-			if path == "." {
+			if currPath == "." {
 				return nil
 			}
 
 			// ignore .driveignore files/dirs
-			if info.IsDir() && driveignore.Match(path, true) {
-				vPrint("skipped directory:", goalPath)
+			if info.IsDir() && driveignore.Match(currPath, true) {
+				vPrint("skipped directory:", relativePath)
 				return filepath.SkipDir
-			} else if !info.IsDir() && driveignore.Match(path, false) {
-				vPrint("skipped file:", goalPath)
+			} else if !info.IsDir() && driveignore.Match(currPath, false) {
+				vPrint("skipped file:", relativePath)
 				return nil
 			}
 
 			// if same name file already exists, check if its the same hardlink, then ignore
 			// else if not, create hardlink
 			// if its a directory, create one if doesnt yet exist
-			goal := filepath.Join(args[0], goalPath)
-			goalStat, err := os.Stat(goal)
-			pathStat, _ := os.Stat(path)
+			goalPath := filepath.Join(args[0], relativePath)
+			goalStat, err := os.Stat(goalPath)
+			currPathStat, _ := os.Stat(currPath)
 			sameNameDiffFile := false
-			if !info.IsDir() && !os.IsNotExist(err) && !os.SameFile(pathStat, goalStat) {
-				os.Remove(goal)
+			if !info.IsDir() && !os.IsNotExist(err) && !os.SameFile(currPathStat, goalStat) {
+				os.Remove(goalPath)
 				sameNameDiffFile = true
 				vPrint("overwritting a file with same name")
 			}
 			if os.IsNotExist(err) || sameNameDiffFile {
 				if info.IsDir() {
-					err = os.Mkdir(goal, os.ModePerm)
+					err = os.Mkdir(goalPath, os.ModePerm)
 					if err != nil {
 						panic(err)
 					}
-					vPrint("created directory:", goalPath)
+					vPrint("created directory:", relativePath)
 				} else {
-					err = os.Link(path, goal)
-					vPrint("created hard link:", goalPath)
+					err = os.Link(currPath, goalPath)
+					vPrint("created hard link:", relativePath)
 					if err != nil {
 						panic(err)
 					}
