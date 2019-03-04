@@ -40,7 +40,7 @@ current folder > global config
 		var driveignore gitignore.IgnoreMatcher
 		var tempFileName string
 
-		localDI := filepath.Join(input, ".driveignore")
+		localDI := filepath.Join(uploadInput, ".driveignore")
 		_, currFile, _, _ := runtime.Caller(0)
 		globalDI := filepath.Join(currFile, "../../.global_driveignore")
 
@@ -70,8 +70,8 @@ current folder > global config
 			file.Close()
 			vPrint("loaded merged global and local .driveignore")
 		}
-		err := filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
-			goalPath, _ := filepath.Rel(input, path)
+		err := filepath.Walk(uploadInput, func(path string, info os.FileInfo, err error) error {
+			goalPath, _ := filepath.Rel(uploadInput, path)
 			if err != nil {
 				panic(err)
 			}
@@ -138,13 +138,13 @@ current folder > global config
 	},
 }
 
-var input string
+var uploadInput string
 var mergeIgnores bool
 
 func init() {
 	rootCmd.AddCommand(uploadCmd)
 
 	// Local flags
-	uploadCmd.Flags().StringVarP(&input, "input", "i", "./", "Input directory of the files to be uploaded")
+	uploadCmd.Flags().StringVarP(&uploadInput, "input", "i", "./", "Input directory of the files to be uploaded")
 	uploadCmd.Flags().BoolVarP(&mergeIgnores, "mergeIgnores", "M", false, "Merges global and current dir .driveignore")
 }
