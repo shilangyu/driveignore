@@ -61,10 +61,10 @@ current folder > global config
 
 			// ignore .driveignore files/dirs
 			if info.IsDir() && driveignore.Match(path, true) {
-				vPrint("skipped directory:", path)
+				vPrint("skipped directory:", goalPath)
 				return filepath.SkipDir
 			} else if !info.IsDir() && driveignore.Match(path, false) {
-				vPrint("skipped file:", path)
+				vPrint("skipped file:", goalPath)
 				return nil
 			}
 
@@ -86,9 +86,10 @@ current folder > global config
 					if err != nil {
 						panic(err)
 					}
+					vPrint("created directory:", goalPath)
 				} else {
 					err = os.Link(path, goal)
-					vPrint("created hard link:", path)
+					vPrint("created hard link:", goalPath)
 					if err != nil {
 						panic(err)
 					}
