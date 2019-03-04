@@ -54,6 +54,11 @@ current folder > global config
 				panic(err)
 			}
 
+			// adding slash to directories for print clarity
+			if temp, _ := os.Stat(currPath); temp.IsDir() {
+				relativePath += "/"
+			}
+
 			// skip the folder itself
 			if currPath == "." {
 				return nil

@@ -64,6 +64,11 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 				return nil
 			}
 
+			// adding slash to directories for print clarity
+			if temp, _ := os.Stat(currPath); temp.IsDir() {
+				relativePath += "/"
+			}
+
 			// ignore .driveignore files/dirs
 			if info.IsDir() && driveignore.Match(currPath, true) {
 				return filepath.SkipDir
@@ -85,6 +90,11 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 			relativePath, _ := filepath.Rel(args[0], currPath)
 			if err != nil {
 				panic(err)
+			}
+
+			// adding slash to directories for print clarity
+			if temp, _ := os.Stat(currPath); temp.IsDir() {
+				relativePath += "/"
 			}
 
 			// skip the folder itself
