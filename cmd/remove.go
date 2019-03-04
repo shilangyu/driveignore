@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/shilangyu/driveignore/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +29,8 @@ var removeCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Removes global .driveignore",
 	Run: func(cmd *cobra.Command, args []string) {
+		vPrint := utils.VPrintWrapper(verbose)
+
 		_, currFile, _, _ := runtime.Caller(0)
 		os.Remove(filepath.Join(currFile, "../../.global_driveignore"))
 		vPrint(".global_driveignore has been deleted")

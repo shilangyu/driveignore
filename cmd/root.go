@@ -21,13 +21,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// prints if verbose is on
-func vPrint(data ...interface{}) {
-	if verbose {
-		fmt.Println(data...)
-	}
-}
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "driveignore",

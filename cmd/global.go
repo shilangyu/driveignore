@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/shilangyu/driveignore/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +33,8 @@ var globalCmd = &cobra.Command{
 You can later decide if you want to use global, local or merged .driveignore.
 Once you set your global .driveignore you can delete the file you pointed to.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		vPrint := utils.VPrintWrapper(verbose)
+
 		_, currFile, _, _ := runtime.Caller(0)
 		cwd, _ := os.Getwd()
 		absPath := filepath.Join(cwd, args[0])
