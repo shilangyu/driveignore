@@ -35,7 +35,7 @@ current folder > global config
 	RunE: func(cmd *cobra.Command, args []string) error {
 		vPrint := utils.VPrintWrapper(verbose)
 
-		driveignore, driveignoreType := utils.DriveIgnore(uploadInput, mergeIgnores)
+		driveignore, driveignoreType := utils.DriveIgnore(uploadInput, uploadMergeIgnores)
 
 		switch driveignoreType {
 		case utils.GlobalIgnore:
@@ -117,12 +117,12 @@ current folder > global config
 }
 
 var uploadInput string
-var mergeIgnores bool
+var uploadMergeIgnores bool
 
 func init() {
 	rootCmd.AddCommand(uploadCmd)
 
 	// Local flags
 	uploadCmd.Flags().StringVarP(&uploadInput, "input", "i", "./", "Input directory of the files to be uploaded")
-	uploadCmd.Flags().BoolVarP(&mergeIgnores, "mergeIgnores", "M", false, "Merges global and current dir .driveignore")
+	uploadCmd.Flags().BoolVarP(&uploadMergeIgnores, "mergeIgnores", "M", false, "Merges global and current dir .driveignore")
 }
