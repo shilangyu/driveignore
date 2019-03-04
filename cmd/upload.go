@@ -54,7 +54,7 @@ current folder > global config
 				panic(err)
 			}
 
-			// skip the folder itself and temp merge file
+			// skip the folder itself
 			if path == "." {
 				return nil
 			}
