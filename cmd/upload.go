@@ -16,13 +16,10 @@ package cmd
 
 import (
 	"errors"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 
-	gitignore "github.com/monochromegane/go-gitignore"
+	"github.com/shilangyu/driveignore/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -36,40 +33,21 @@ The order of importance of a .driveignore file:
 current folder > global config 
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// decide on .driveignore
-		var driveignore gitignore.IgnoreMatcher
-		var tempFileName string
+		vPrint := utils.VPrintWrapper(verbose)
 
-		localDI := filepath.Join(uploadInput, ".driveignore")
-		_, currFile, _, _ := runtime.Caller(0)
-		globalDI := filepath.Join(currFile, "../../.global_driveignore")
+		driveignore, driveignoreType := utils.DriveIgnore(uploadInput, mergeIgnores)
 
-		_, err1 := os.Stat(localDI)
-		_, err2 := os.Stat(globalDI)
-		if os.IsNotExist(err1) && os.IsNotExist(err2) {
-			return errors.New("No local nor global .driveignores found")
-		} else if (!os.IsNotExist(err1) && !mergeIgnores) || (os.IsNotExist(err2) && mergeIgnores) {
-			driveignore, _ = gitignore.NewGitIgnore(localDI, "./")
-			vPrint("loaded local .driveignore")
-		} else if (!os.IsNotExist(err2) && !mergeIgnores) || (os.IsNotExist(err1) && mergeIgnores) {
-			driveignore, _ = gitignore.NewGitIgnore(globalDI, "./")
+		switch driveignoreType {
+		case utils.GlobalIgnore:
 			vPrint("loaded global .driveignore")
-		} else if !os.IsNotExist(err1) && !os.IsNotExist(err2) && mergeIgnores {
-			globalContent, _ := ioutil.ReadFile(globalDI)
-			localContent, _ := ioutil.ReadFile(localDI)
-
-			file, err := ioutil.TempFile("./", "tmp.*.temp")
-			if err != nil {
-				log.Fatal(err)
-			}
-			tempFileName = file.Name()
-			defer os.Remove(file.Name())
-			file.Write([]byte(string(globalContent) + "\n" + string(localContent)))
-
-			driveignore, _ = gitignore.NewGitIgnore(file.Name(), "./")
-			file.Close()
+		case utils.LocalIgnore:
+			vPrint("loaded local .driveignore")
+		case utils.MergedIgnore:
 			vPrint("loaded merged global and local .driveignore")
+		case utils.NoIgnore:
+			return errors.New("No local nor global .driveignores found")
 		}
+
 		err := filepath.Walk(uploadInput, func(path string, info os.FileInfo, err error) error {
 			goalPath, _ := filepath.Rel(uploadInput, path)
 			if err != nil {
@@ -77,7 +55,7 @@ current folder > global config
 			}
 
 			// skip the folder itself and temp merge file
-			if path == "." || path == tempFileName {
+			if path == "." {
 				return nil
 			}
 
