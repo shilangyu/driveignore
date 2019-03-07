@@ -78,8 +78,8 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 
 			// check if file/directory exists in drive sync folder
 			goalPath := filepath.Join(args[0], relativePath)
-			_, err = os.Stat(goalPath)
-			if os.IsNotExist(err) {
+			goalStat, err := os.Stat(goalPath)
+			if os.IsNotExist(err) || (!os.SameFile(info, goalStat) && !info.IsDir()) {
 				redPrint(relativePath)
 			}
 			return nil
@@ -104,8 +104,8 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 
 			// check if file exists in input folder
 			inputPath := filepath.Join(diffInput, relativePath)
-			_, err = os.Stat(inputPath)
-			if os.IsNotExist(err) {
+			goalStat, err := os.Stat(inputPath)
+			if os.IsNotExist(err) || (!os.SameFile(info, goalStat) && !info.IsDir()) {
 				yellowPrint(relativePath)
 			}
 			return nil
