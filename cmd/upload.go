@@ -36,6 +36,10 @@ current folder > global config
 	RunE: func(cmd *cobra.Command, args []string) error {
 		vPrint := utils.VPrintWrapper(verbose)
 
+		if uploadForce {
+			vPrint("Using --force, hope you know what are you doing")
+		}
+
 		driveignore, driveignoreType := utils.DriveIgnore(uploadInput, uploadMergeIgnores)
 
 		switch driveignoreType {
@@ -82,10 +86,10 @@ current folder > global config
 			currPathStat, _ := os.Stat(currPath)
 			sameNameDiffFile := false
 			if !info.IsDir() && !os.IsNotExist(err) && !os.SameFile(currPathStat, goalStat) {
-				if false {
+				if uploadForce {
 					sameNameDiffFile = true
 					os.Remove(goalPath)
-					vPrint("overwritting a file with same name")
+					vPrint("overwritting a file with same name:")
 				} else {
 					fmt.Printf("cannot upload '%s'. A file with the same name already exists.\n", relativePath)
 				}
@@ -129,6 +133,7 @@ current folder > global config
 
 var uploadInput string
 var uploadMergeIgnores bool
+var uploadForce bool
 
 func init() {
 	rootCmd.AddCommand(uploadCmd)
@@ -136,4 +141,5 @@ func init() {
 	// Local flags
 	uploadCmd.Flags().StringVarP(&uploadInput, "input", "i", "./", "Input directory of the files to be uploaded")
 	uploadCmd.Flags().BoolVarP(&uploadMergeIgnores, "mergeIgnores", "M", false, "Merges global and current dir .driveignore")
+	uploadCmd.Flags().BoolVar(&uploadForce, "force", false, "Forces the upload even if warnings pop up")
 }
