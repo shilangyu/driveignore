@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -81,9 +82,13 @@ current folder > global config
 			currPathStat, _ := os.Stat(currPath)
 			sameNameDiffFile := false
 			if !info.IsDir() && !os.IsNotExist(err) && !os.SameFile(currPathStat, goalStat) {
-				os.Remove(goalPath)
-				sameNameDiffFile = true
-				vPrint("overwritting a file with same name")
+				if false {
+					sameNameDiffFile = true
+					os.Remove(goalPath)
+					vPrint("overwritting a file with same name")
+				} else {
+					fmt.Printf("cannot upload '%s'. A file with the same name already exists.\n", relativePath)
+				}
 			}
 			if os.IsNotExist(err) || sameNameDiffFile {
 				if info.IsDir() {
