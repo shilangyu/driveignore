@@ -28,7 +28,7 @@ import (
 var uploadCmd = &cobra.Command{
 	Use:   "upload [output path]",
 	Short: "Upload a directory to your drive folder",
-	Long: `Uploads files from the current directory (can be overwritten with --input flag) to a drive folder
+	Long: `Uploads files from the input directory (can be overwritten with --input flag) to a drive folder
 It will ignore files that satisfy the .driveignore
 The order of importance of a .driveignore file:
 current folder > global config 
@@ -140,6 +140,6 @@ func init() {
 
 	// Local flags
 	uploadCmd.Flags().StringVarP(&uploadInput, "input", "i", "./", "Input directory of the files to be uploaded")
-	uploadCmd.Flags().BoolVarP(&uploadMergeIgnores, "mergeIgnores", "M", false, "Merges global and current dir .driveignore")
+	uploadCmd.Flags().BoolVarP(&uploadMergeIgnores, "mergeIgnores", "M", false, "Merges global and input dir .driveignore")
 	uploadCmd.Flags().BoolVar(&uploadForce, "force", false, "Forces the upload even if warnings pop up")
 }
