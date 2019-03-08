@@ -23,3 +23,14 @@ And you're done! Google drive will take care of the rest, which is syncing the f
 ## global vs local .driveignore
 
 You can create a global `.driveignore` using the `driveignore global [path to global driveignore]`, that way if you want to upload a directory without a `.driveignore` the global one will be used. You can also force a merge of local and global `.driveignore` during upload using the `--mergeIgnores` flag.
+
+## available commands
+
+| name   | description                                     |
+| ------ | ----------------------------------------------- |
+| clean  | Cleans your drive sync folder from old files    |
+| diff   | Compares your directory with the drive one      |
+| global | Set your global .driveignore                    |
+| help   | Help about any command                          |
+| unify  | Unifies 2 directories where input is the source |
+| upload | Upload a directory to your drive folder         |
