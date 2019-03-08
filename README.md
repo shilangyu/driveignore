@@ -1,10 +1,11 @@
 # driveignore
 
-This simple cli tools works **together with** the [google drive sync](https://www.google.com/drive/download/) allowing you to have .driveignore files. Driveignore uses hardlinks, meaning no files duplicates, no repetitive cli calls, and blazing fast 'upload' times.
+This simple cli tools works **together with** the [google drive sync](https://www.google.com/drive/download/) allowing you to have .driveignore files. Driveignore uses hardlinks, meaning no files duplicates, no repetitive cli calls, and blazing fast 'upload' speeds.
 
 ## installing
 
-- make sure you have [golang](https://golang.org/dl/) installed
+- install [golang](https://golang.org/dl/)
+- install [google drive sync](https://www.google.com/drive/download/)
 - run the `go get github.com/shilangyu/driveignore` command
 
 Done! You will now have `driveignore` as a command in your terminal.
@@ -13,7 +14,7 @@ Done! You will now have `driveignore` as a command in your terminal.
 
 You can get all the help about each command by using the `--help` (`-h`) flag.
 
-- Create a folder and add it to your downloaded google drive watch list
+- Create an empty folder and add it to the google drive watch list
 - Create a `.driveignore` the same way you would a `.gitignore` in the root of a directory you wish to sync
 - run `driveignore upload [path to your folder from step 1]`. The current working directory will be cloned to the drive folder with respect to the `.driveignore` blacklist
 
