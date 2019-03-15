@@ -70,5 +70,5 @@ func init() {
 
 	// local flags
 	unifyCmd.Flags().StringVarP(&unifyInput, "input", "i", "./", "Input directory of the files to be uploaded")
-	unifyCmd.Flags().BoolVarP(&unifyMergeIgnores, "mergeIgnores", "M", false, "Merges global and input dir .driveignore")
+	unifyCmd.Flags().BoolVarP(&unifyMergeIgnores, "merge-ignores", "M", false, "Merges global and input dir .driveignore")
 }

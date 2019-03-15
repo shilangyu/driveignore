@@ -140,6 +140,6 @@ func init() {
 
 	// Local flags
 	uploadCmd.Flags().StringVarP(&uploadInput, "input", "i", "./", "Input directory of the files to be uploaded")
-	uploadCmd.Flags().BoolVarP(&uploadMergeIgnores, "mergeIgnores", "M", false, "Merges global and input dir .driveignore")
+	uploadCmd.Flags().BoolVarP(&uploadMergeIgnores, "merge-ignores", "M", false, "Merges global and input dir .driveignore")
 	uploadCmd.Flags().BoolVar(&uploadForce, "force", false, "Forces the upload even if warnings pop up")
 }

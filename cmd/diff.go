@@ -136,5 +136,5 @@ func init() {
 
 	// Local flags
 	diffCmd.Flags().StringVarP(&diffInput, "input", "i", "./", "Input directory of the files to be compared")
-	diffCmd.Flags().BoolVarP(&diffMergeIgnores, "mergeIgnores", "M", false, "Merges global and input dir .driveignore")
+	diffCmd.Flags().BoolVarP(&diffMergeIgnores, "merge-ignores", "M", false, "Merges global and input dir .driveignore")
 }
