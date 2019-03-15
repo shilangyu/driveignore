@@ -69,6 +69,6 @@ func init() {
 	rootCmd.AddCommand(unifyCmd)
 
 	// local flags
-	unifyCmd.Flags().StringVarP(&unifyInput, "input", "i", "./", "Input directory of the files to be uploaded")
+	unifyCmd.Flags().StringVarP(&unifyInput, "input", "i", ".", "Input directory of the files to be uploaded")
 	unifyCmd.Flags().BoolVarP(&unifyMergeIgnores, "merge-ignores", "M", false, "Merges global and input dir .driveignore")
 }

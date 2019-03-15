@@ -83,5 +83,5 @@ func init() {
 	rootCmd.AddCommand(cleanCmd)
 
 	// Local flags
-	cleanCmd.Flags().StringVarP(&cleanInput, "input", "i", "./", "Input directory of source files")
+	cleanCmd.Flags().StringVarP(&cleanInput, "input", "i", ".", "Input directory of source files")
 }

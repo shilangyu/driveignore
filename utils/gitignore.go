@@ -49,23 +49,23 @@ func DriveIgnore(localPath string, mergeIgnores bool) (driveignore gitignore.Ign
 	if os.IsNotExist(err1) && os.IsNotExist(err2) {
 		ignorer = NoIgnore
 	} else if (!os.IsNotExist(err1) && !mergeIgnores) || (os.IsNotExist(err2) && mergeIgnores) {
-		driveignore, _ = gitignore.NewGitIgnore(localDI, "./")
+		driveignore, _ = gitignore.NewGitIgnore(localDI, ".")
 		ignorer = LocalIgnore
 	} else if (!os.IsNotExist(err2) && !mergeIgnores) || (os.IsNotExist(err1) && mergeIgnores) {
-		driveignore, _ = gitignore.NewGitIgnore(globalDI, "./")
+		driveignore, _ = gitignore.NewGitIgnore(globalDI, ".")
 		ignorer = GlobalIgnore
 	} else if !os.IsNotExist(err1) && !os.IsNotExist(err2) && mergeIgnores {
 		globalContent, _ := ioutil.ReadFile(globalDI)
 		localContent, _ := ioutil.ReadFile(localDI)
 
-		file, err := ioutil.TempFile("./", "tmp.*.temp")
+		file, err := ioutil.TempFile(".", "tmp.*.temp")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer os.Remove(file.Name())
 		file.Write([]byte(string(globalContent) + "\n" + string(localContent)))
 
-		driveignore, _ = gitignore.NewGitIgnore(file.Name(), "./")
+		driveignore, _ = gitignore.NewGitIgnore(file.Name(), ".")
 		file.Close()
 		ignorer = MergedIgnore
 	}
