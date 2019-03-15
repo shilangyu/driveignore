@@ -22,7 +22,6 @@ func VPrintWrapper(verbose bool) func(...interface{}) {
 		return func(data ...interface{}) {
 			fmt.Println(data...)
 		}
-	} else {
-		return func(data ...interface{}) {}
 	}
+	return func(data ...interface{}) {}
 }
