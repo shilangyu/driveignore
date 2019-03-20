@@ -37,14 +37,20 @@ Its an alias for: 'driveignore upload [args] [flags] --force' + 'driveignore cle
 		cleanInput = unifyInput
 
 		// call commands
-		err := uploadCmd.RunE(cmd, args)
-		if err != nil {
-			return err
+		errs := make(chan error, 2)
+		go func() {
+			errs <- uploadCmd.RunE(cmd, args)
+		}()
+		go func() {
+			errs <- cleanCmd.RunE(cmd, args)
+		}()
+
+		for i := 0; i < cap(errs); i++ {
+			if err := <-errs; err != nil {
+				return err
+			}
 		}
-		err = cleanCmd.RunE(cmd, args)
-		if err != nil {
-			return err
-		}
+
 		return nil
 	},
 	Args: func(cmd *cobra.Command, args []string) error {

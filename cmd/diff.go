@@ -52,65 +52,79 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 			return errors.New("No local nor global .driveignores found")
 		}
 
+		missing, old := make(chan string), make(chan string)
+
 		// search for missing files
-		filepath.Walk(diffInput, func(currPath string, info os.FileInfo, err error) error {
-			relativePath, _ := filepath.Rel(diffInput, currPath)
-			if err != nil {
-				panic(err)
-			}
+		go func() {
+			filepath.Walk(diffInput, func(currPath string, info os.FileInfo, err error) error {
+				relativePath, _ := filepath.Rel(diffInput, currPath)
+				if err != nil {
+					panic(err)
+				}
 
-			// skip the folder itself
-			if currPath == "." {
+				// skip the folder itself
+				if currPath == "." {
+					return nil
+				}
+
+				// adding slash to directories for print clarity
+				if temp, _ := os.Stat(currPath); temp.IsDir() {
+					relativePath += "\\"
+				}
+
+				// ignore .driveignore files/dirs
+				if info.IsDir() && driveignore.Match(currPath, true) {
+					return filepath.SkipDir
+				} else if !info.IsDir() && driveignore.Match(currPath, false) {
+					return nil
+				}
+
+				// check if file/directory exists in drive sync folder
+				goalPath := filepath.Join(args[0], relativePath)
+				goalStat, err := os.Stat(goalPath)
+				if os.IsNotExist(err) || (!os.SameFile(info, goalStat) && !info.IsDir()) {
+					missing <- relativePath
+				}
 				return nil
-			}
-
-			// adding slash to directories for print clarity
-			if temp, _ := os.Stat(currPath); temp.IsDir() {
-				relativePath += "\\"
-			}
-
-			// ignore .driveignore files/dirs
-			if info.IsDir() && driveignore.Match(currPath, true) {
-				return filepath.SkipDir
-			} else if !info.IsDir() && driveignore.Match(currPath, false) {
-				return nil
-			}
-
-			// check if file/directory exists in drive sync folder
-			goalPath := filepath.Join(args[0], relativePath)
-			goalStat, err := os.Stat(goalPath)
-			if os.IsNotExist(err) || (!os.SameFile(info, goalStat) && !info.IsDir()) {
-				redPrint(relativePath)
-			}
-			return nil
-		})
+			})
+			close(missing)
+		}()
 
 		// search for legacy files/directories
-		filepath.Walk(args[0], func(currPath string, info os.FileInfo, err error) error {
-			relativePath, _ := filepath.Rel(args[0], currPath)
-			if err != nil {
-				panic(err)
-			}
+		go func() {
+			filepath.Walk(args[0], func(currPath string, info os.FileInfo, err error) error {
+				relativePath, _ := filepath.Rel(args[0], currPath)
+				if err != nil {
+					panic(err)
+				}
 
-			// adding slash to directories for print clarity
-			if temp, _ := os.Stat(currPath); temp.IsDir() {
-				relativePath += "\\"
-			}
+				// adding slash to directories for print clarity
+				if temp, _ := os.Stat(currPath); temp.IsDir() {
+					relativePath += "\\"
+				}
 
-			// skip the folder itself
-			if currPath == "." {
+				// skip the folder itself
+				if currPath == "." {
+					return nil
+				}
+
+				// check if file exists in input folder
+				inputPath := filepath.Join(diffInput, relativePath)
+				goalStat, err := os.Stat(inputPath)
+				if os.IsNotExist(err) || (!os.SameFile(info, goalStat) && !info.IsDir()) {
+					old <- relativePath
+				}
 				return nil
-			}
+			})
+			close(old)
+		}()
 
-			// check if file exists in input folder
-			inputPath := filepath.Join(diffInput, relativePath)
-			goalStat, err := os.Stat(inputPath)
-			if os.IsNotExist(err) || (!os.SameFile(info, goalStat) && !info.IsDir()) {
-				yellowPrint(relativePath)
-			}
-			return nil
-		})
-
+		for m := range missing {
+			redPrint(m)
+		}
+		for o := range old {
+			yellowPrint(o)
+		}
 		return nil
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
