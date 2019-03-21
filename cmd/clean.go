@@ -34,22 +34,7 @@ remove files that do not exist in your source files.
 		vPrint := utils.VPrintWrapper(verbose)
 
 		// remove legacy files
-		filepath.Walk(args[0], func(currPath string, info os.FileInfo, err error) error {
-			relativePath, _ := filepath.Rel(args[0], currPath)
-			if err != nil {
-				panic(err)
-			}
-
-			// skip the folder itself
-			if currPath == "." {
-				return nil
-			}
-
-			// adding slash to directories for print clarity
-			if temp, _ := os.Stat(currPath); temp.IsDir() {
-				relativePath += "\\"
-			}
-
+		err := utils.Walker(args[0], func(currPath string, info os.FileInfo, relativePath string) error {
 			// check if file/directory exists in source folder
 			sourcePath := filepath.Join(cleanInput, relativePath)
 			sourceStat, err := os.Stat(sourcePath)
@@ -60,7 +45,7 @@ remove files that do not exist in your source files.
 			return nil
 		})
 
-		return nil
+		return err
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {

@@ -53,22 +53,7 @@ current folder > global config
 			return errors.New("No local nor global .driveignores found")
 		}
 
-		err := filepath.Walk(uploadInput, func(currPath string, info os.FileInfo, err error) error {
-			relativePath, _ := filepath.Rel(uploadInput, currPath)
-			if err != nil {
-				panic(err)
-			}
-
-			// adding slash to directories for print clarity
-			if temp, _ := os.Stat(currPath); temp.IsDir() {
-				relativePath += "\\"
-			}
-
-			// skip the folder itself
-			if currPath == "." {
-				return nil
-			}
-
+		err := utils.Walker(uploadInput, func(currPath string, info os.FileInfo, relativePath string) error {
 			// ignore .driveignore files/dirs
 			if info.IsDir() && driveignore.Match(currPath, true) {
 				vPrint("skipped directory:", relativePath)

@@ -56,22 +56,7 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 
 		// search for missing files
 		go func() {
-			filepath.Walk(diffInput, func(currPath string, info os.FileInfo, err error) error {
-				relativePath, _ := filepath.Rel(diffInput, currPath)
-				if err != nil {
-					panic(err)
-				}
-
-				// skip the folder itself
-				if currPath == "." {
-					return nil
-				}
-
-				// adding slash to directories for print clarity
-				if temp, _ := os.Stat(currPath); temp.IsDir() {
-					relativePath += "\\"
-				}
-
+			utils.Walker(diffInput, func(currPath string, info os.FileInfo, relativePath string) error {
 				// ignore .driveignore files/dirs
 				if info.IsDir() && driveignore.Match(currPath, true) {
 					return filepath.SkipDir
@@ -92,22 +77,7 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 
 		// search for legacy files/directories
 		go func() {
-			filepath.Walk(args[0], func(currPath string, info os.FileInfo, err error) error {
-				relativePath, _ := filepath.Rel(args[0], currPath)
-				if err != nil {
-					panic(err)
-				}
-
-				// adding slash to directories for print clarity
-				if temp, _ := os.Stat(currPath); temp.IsDir() {
-					relativePath += "\\"
-				}
-
-				// skip the folder itself
-				if currPath == "." {
-					return nil
-				}
-
+			utils.Walker(args[0], func(currPath string, info os.FileInfo, relativePath string) error {
 				// check if file exists in input folder
 				inputPath := filepath.Join(diffInput, relativePath)
 				goalStat, err := os.Stat(inputPath)
