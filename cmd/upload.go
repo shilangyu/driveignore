@@ -96,10 +96,7 @@ current folder > global config
 			}
 			return nil
 		})
-		if err != nil {
-			panic(err)
-		}
-		return nil
+		return err
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {

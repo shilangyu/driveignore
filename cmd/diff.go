@@ -54,9 +54,11 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 
 		missing, old := make(chan string), make(chan string)
 
+		var err1, err2 error
+
 		// search for missing files
 		go func() {
-			utils.Walker(diffInput, func(currPath string, info os.FileInfo, relativePath string) error {
+			err1 = utils.Walker(diffInput, func(currPath string, info os.FileInfo, relativePath string) error {
 				// ignore .driveignore files/dirs
 				if info.IsDir() && driveignore.Match(currPath, true) {
 					return filepath.SkipDir
@@ -77,7 +79,7 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 
 		// search for legacy files/directories
 		go func() {
-			utils.Walker(args[0], func(currPath string, info os.FileInfo, relativePath string) error {
+			err2 = utils.Walker(args[0], func(currPath string, info os.FileInfo, relativePath string) error {
 				// check if file exists in input folder
 				inputPath := filepath.Join(diffInput, relativePath)
 				goalStat, err := os.Stat(inputPath)
@@ -92,8 +94,14 @@ Yellow - your drive sync folder has a file that doesnt exist in input
 		for m := range missing {
 			redPrint(m)
 		}
+		if err1 != nil {
+			return err1
+		}
 		for o := range old {
 			yellowPrint(o)
+		}
+		if err2 != nil {
+			return err2
 		}
 		return nil
 	},
