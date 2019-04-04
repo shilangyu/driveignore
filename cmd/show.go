@@ -28,10 +28,14 @@ import (
 var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Shows the current .global_driveignore",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		_, currFile, _, _ := runtime.Caller(0)
-		content, _ := ioutil.ReadFile(filepath.Join(currFile, "../../.global_driveignore"))
+		content, err := ioutil.ReadFile(filepath.Join(currFile, "../../.global_driveignore"))
+		if err != nil {
+			return errors.New("There is no global driveignore currently set")
+		}
 		fmt.Println(string(content))
+		return nil
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 0 {
