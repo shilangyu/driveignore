@@ -22,29 +22,44 @@ import (
 )
 
 // CatchOutput will temporarily catch all stdout and stderr and return it
-func CatchOutput(f func()) string {
-	reader, writer, _ := os.Pipe()
+func CatchOutput(f func()) (out string, err string) {
 	stdout := os.Stdout
 	stderr := os.Stderr
 	defer func() {
 		os.Stdout = stdout
 		os.Stderr = stderr
 	}()
-	os.Stdout = writer
-	os.Stderr = writer
 
-	out := make(chan string)
+	outs := make(chan string)
+	errs := make(chan string)
 	wg := sync.WaitGroup{}
+
+	outReader, outWriter, _ := os.Pipe()
+	os.Stdout = outWriter
 	wg.Add(1)
 	go func() {
 		var buffer bytes.Buffer
 		wg.Done()
-		io.Copy(&buffer, reader)
-		out <- buffer.String()
+		io.Copy(&buffer, outReader)
+		outs <- buffer.String()
+	}()
+	wg.Wait()
+
+	errReader, errWriter, _ := os.Pipe()
+	os.Stderr = errWriter
+	wg.Add(1)
+	go func() {
+		var buffer bytes.Buffer
+		wg.Done()
+		io.Copy(&buffer, errReader)
+		errs <- buffer.String()
 	}()
 	wg.Wait()
 
 	f()
-	writer.Close()
-	return <-out
+	outWriter.Close()
+	errWriter.Close()
+	out = <-outs
+	err = <-errs
+	return
 }
