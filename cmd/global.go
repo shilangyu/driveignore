@@ -19,7 +19,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/shilangyu/driveignore/utils"
 	"github.com/spf13/cobra"
@@ -35,18 +34,26 @@ Once you set your global .driveignore you can delete the file you pointed to.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vPrint := utils.VPrintWrapper(verbose)
 
-		_, currFile, _, _ := runtime.Caller(0)
 		cwd, _ := os.Getwd()
+		configDir, _ := os.UserConfigDir()
 		absPath := filepath.Join(cwd, args[0])
 		content, _ := ioutil.ReadFile(absPath)
 		vPrint("loaded file contents")
 		if shouldAppend {
-			currContent, _ := ioutil.ReadFile(filepath.Join(currFile, "../../.global_driveignore"))
-			ioutil.WriteFile(filepath.Join(currFile, "../../.global_driveignore"), []byte(string(content)+"\n"+string(currContent)), os.ModePerm)
-			vPrint("appended the contents to the .global_driveignore")
+			currContent, _ := ioutil.ReadFile(filepath.Join(configDir, ".global_driveignore"))
+			err := ioutil.WriteFile(filepath.Join(configDir, ".global_driveignore"), []byte(string(content)+"\n"+string(currContent)), os.ModePerm)
+			if err != nil {
+				vPrint(err)
+			} else {
+				vPrint("appended the contents to the .global_driveignore")
+			}
 		} else {
-			ioutil.WriteFile(filepath.Join(currFile, "../../.global_driveignore"), content, os.ModePerm)
-			vPrint("saved the contents to the .global_driveignore")
+			err := ioutil.WriteFile(filepath.Join(configDir, ".global_driveignore"), content, os.ModePerm)
+			if err != nil {
+				vPrint(err)
+			} else {
+				vPrint("saved the contents to the .global_driveignore")
+			}
 		}
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
