@@ -31,7 +31,7 @@ var globalCmd = &cobra.Command{
 	Long: `If you wish to have a global .driveignore you can set the content of to it here.
 You can later decide if you want to use global, local or merged .driveignore.
 Once you set your global .driveignore you can delete the file you pointed to.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		vPrint := utils.VPrintWrapper(verbose)
 
 		cwd, _ := os.Getwd()
@@ -43,18 +43,20 @@ Once you set your global .driveignore you can delete the file you pointed to.`,
 			currContent, _ := ioutil.ReadFile(filepath.Join(configDir, ".global_driveignore"))
 			err := ioutil.WriteFile(filepath.Join(configDir, ".global_driveignore"), []byte(string(content)+"\n"+string(currContent)), os.ModePerm)
 			if err != nil {
-				vPrint(err)
+				return err
 			} else {
 				vPrint("appended the contents to the .global_driveignore")
 			}
 		} else {
 			err := ioutil.WriteFile(filepath.Join(configDir, ".global_driveignore"), content, os.ModePerm)
 			if err != nil {
-				vPrint(err)
+				return err
 			} else {
 				vPrint("saved the contents to the .global_driveignore")
 			}
 		}
+
+		return nil
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
