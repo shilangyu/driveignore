@@ -40,3 +40,12 @@ func Walker(path string, walk func(string, os.FileInfo, string) error) error {
 		return walk(currPath, info, relativePath)
 	})
 }
+
+// GlobalDriveignorePath returns absolute path to .global_driveignore
+func GlobalDriveignorePath() string {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Join(dir, ".global_driveignore")
+}

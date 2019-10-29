@@ -35,7 +35,7 @@ var globalCmd = &cobra.Command{
 	Long: `If you wish to have a global .driveignore you can set the content of to it here.
 You can later decide if you want to use global, local or merged .driveignore.
 Once you set your global .driveignore you can delete the file you pointed to.`,
-	RunE: globalRun("../../.global_driveignore"),
+	RunE: globalRun(utils.GlobalDriveignorePath()),
 	Args: globalArg,
 }
 
