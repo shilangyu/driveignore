@@ -18,10 +18,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
-	"path"
-	"path/filepath"
-	"runtime"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -40,7 +36,6 @@ Once you set your global .driveignore you can delete the file you pointed to.`,
 }
 
 var (
-	errRuntimeCaller    = errors.New("runtime.Caller not ok")
 	errOneArg           = errors.New("There should only be one argument")
 	errPathDoesntExist  = errors.New("Passed path doesnt exist")
 	errPathIsADirectory = errors.New("Passed path is a directory, not file")
@@ -49,33 +44,22 @@ var (
 func globalRun(globalDriveignorePath string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		vPrint := utils.VPrintWrapper(verbose)
-		_, currFile, _, ok := runtime.Caller(0)
-		cwd, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		if !ok {
-			return errRuntimeCaller
-		}
-		absPath := getAbsPathFrom(args[0], cwd)
-		currDir, _ := path.Split(currFile)
-		globalDriveignoreAbsPath := getAbsPathFrom(globalDriveignorePath, currDir)
-		content, err := ioutil.ReadFile(absPath)
+		content, err := ioutil.ReadFile(args[0])
 		if err != nil {
 			return err
 		}
 		vPrint("loaded file contents")
 		if shouldAppend {
-			currContent, err := ioutil.ReadFile(globalDriveignoreAbsPath)
+			currContent, err := ioutil.ReadFile(globalDriveignorePath)
 			if err != nil {
 				return err
 			}
-			if err := ioutil.WriteFile(globalDriveignoreAbsPath, []byte(string(content)+"\n"+string(currContent)), os.ModePerm); err != nil {
+			if err := ioutil.WriteFile(globalDriveignorePath, []byte(string(content)+"\n"+string(currContent)), os.ModePerm); err != nil {
 				return err
 			}
 			vPrint("appended the contents to the .global_driveignore")
 		} else {
-			if err := ioutil.WriteFile(globalDriveignoreAbsPath, content, os.ModePerm); err != nil {
+			if err := ioutil.WriteFile(globalDriveignorePath, content, os.ModePerm); err != nil {
 				return err
 			}
 			vPrint("saved the contents to the .global_driveignore")
@@ -84,15 +68,7 @@ func globalRun(globalDriveignorePath string) func(cmd *cobra.Command, args []str
 	}
 }
 
-func getAbsPathFrom(path, cwd string) string {
-	if strings.HasPrefix(path, "/") {
-		return path // already abs path
-	}
-	absPath := filepath.Join(cwd, path)
-	return absPath
-}
-
-func globalArg(cmd *cobra.Command, args []string) error {
+func globalArg(_ *cobra.Command, args []string) error {
 	if len(args) != 1 {
 		return errOneArg
 	}
