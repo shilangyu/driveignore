@@ -47,5 +47,5 @@ func GlobalDriveignorePath() string {
 	if err != nil {
 		panic(err)
 	}
-	return filepath.Join(dir, ".global_driveignore")
+	return filepath.Join(dir, "/driveignore/.global_driveignore")
 }
