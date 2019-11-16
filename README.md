@@ -1,5 +1,7 @@
 # driveignore
 
+![](https://github.com/shilangyu/driveignore/workflows/Driveignore/badge.svg)
+
 This simple cli tools works **together with** the [google drive sync](https://www.google.com/drive/download/) allowing you to have .driveignore files. Driveignore uses hardlinks, meaning no files duplicates, no repetitive cli calls, and blazing fast 'upload' speeds.
 
 ## installing
