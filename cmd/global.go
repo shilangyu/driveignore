@@ -16,8 +16,10 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -26,66 +28,44 @@ import (
 
 // globalCmd represents the global command
 var globalCmd = &cobra.Command{
-	Use:   "global [path to .driveignore]",
-	Short: "Set your global .driveignore",
+	Use:   "global",
+	Short: "Get the path to your global .driveignore",
 	Long: `If you wish to have a global .driveignore you can set the content of to it here.
-You can later decide if you want to use global, local or merged .driveignore.
-Once you set your global .driveignore you can delete the file you pointed to.`,
-	RunE: globalRun(utils.GlobalDriveignorePath()),
-	Args: globalArg,
+You can later decide if you want to use global, local or merged .driveignore.`,
+	Example: "vim $(driveignore global)",
+	RunE:    globalRun(utils.GlobalDriveignorePath()),
+	Args:    globalArg,
 }
 
 var (
-	errOneArg           = errors.New("There should only be one argument")
-	errPathDoesntExist  = errors.New("Passed path doesnt exist")
-	errPathIsADirectory = errors.New("Passed path is a directory, not file")
+	errNoArg = errors.New("There should only be no arguments")
 )
 
 func globalRun(globalDriveignorePath string) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		vPrint := utils.VPrintWrapper(verbose)
-		content, err := ioutil.ReadFile(args[0])
-		if err != nil {
-			return err
-		}
-		vPrint("loaded file contents")
-		if shouldAppend {
-			currContent, err := ioutil.ReadFile(globalDriveignorePath)
+
+		if _, err := os.Stat(globalDriveignorePath); os.IsNotExist(err) {
+			os.MkdirAll(filepath.Dir(globalDriveignorePath), os.ModePerm)
+			err := ioutil.WriteFile(globalDriveignorePath, []byte{}, os.ModePerm)
 			if err != nil {
-				return err
+				return nil
 			}
-			if err := ioutil.WriteFile(globalDriveignorePath, []byte(string(content)+"\n"+string(currContent)), os.ModePerm); err != nil {
-				return err
-			}
-			vPrint("appended the contents to the .global_driveignore")
-		} else {
-			if err := ioutil.WriteFile(globalDriveignorePath, content, os.ModePerm); err != nil {
-				return err
-			}
-			vPrint("saved the contents to the .global_driveignore")
+			vPrint(".global_driveignore didnt exist, created a new one")
 		}
+
+		fmt.Println(globalDriveignorePath)
 		return nil
 	}
 }
 
 func globalArg(_ *cobra.Command, args []string) error {
-	if len(args) != 1 {
-		return errOneArg
-	}
-	fstat, err := os.Stat(args[0])
-	if os.IsNotExist(err) {
-		return errPathDoesntExist
-	}
-	if fstat.IsDir() {
-		return errPathIsADirectory
+	if len(args) != 0 {
+		return errNoArg
 	}
 	return nil
 }
 
-var shouldAppend bool
-
 func init() {
 	rootCmd.AddCommand(globalCmd)
-
-	globalCmd.Flags().BoolVarP(&shouldAppend, "append", "a", false, "appends file contents to existing .global_driveignore")
 }
