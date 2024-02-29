@@ -31,7 +31,7 @@ var uploadCmd = &cobra.Command{
 	Long: `Uploads files from the input directory (can be overwritten with --input flag) to a drive folder
 It will ignore files that satisfy the .driveignore
 The order of importance of a .driveignore file:
-current folder > global config 
+current folder > global config
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		vPrint := utils.VPrintWrapper(verbose)
@@ -80,13 +80,12 @@ current folder > global config
 				}
 			}
 			if os.IsNotExist(err) || sameNameDiffFile {
-				if info.IsDir() {
-					err = os.Mkdir(goalPath, os.ModePerm)
-					if err != nil {
-						panic(err)
-					}
-					vPrint("created directory:", relativePath)
-				} else {
+				err = os.MkdirAll(filepath.Dir(goalPath), os.ModePerm)
+				if err != nil {
+					panic(err)
+				}
+				vPrint("created directory:", relativePath)
+				if !info.IsDir() {
 					err = os.Link(currPath, goalPath)
 					vPrint("created hard link:", relativePath)
 					if err != nil {
