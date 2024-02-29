@@ -13,7 +13,7 @@ This simple cli tools works **together with** the [google drive sync](https://ww
 or
 
 - install [golang](https://golang.org/dl/)
-- run the `go get github.com/shilangyu/driveignore` command
+- run the `go install github.com/shilangyu/driveignore@latest` command
 - install [google drive sync](https://www.google.com/drive/download/)
 
 Done! You will now have `driveignore` as a command in your terminal.
