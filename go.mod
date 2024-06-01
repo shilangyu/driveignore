@@ -3,7 +3,7 @@ module github.com/shilangyu/driveignore
 go 1.13
 
 require (
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.17.0
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20160105113617-38717d0a108c
 	github.com/spf13/cobra v1.8.0
